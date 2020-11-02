@@ -1,0 +1,18 @@
+[{:db/ident :payment-attempt/id
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/unique :db.unique/identity
+  :db/doc "Payment attempt id"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :payment-attempt/amount
+  :db/valueType :db.type/bigdec
+  :db/cardinality :db.cardinality/one
+  :db/doc "Payment attempt amount"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :payment-attempt/product-id
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "Produc id related to this payment attempt"
+  :db.install/_attribute :db.part/db}]
