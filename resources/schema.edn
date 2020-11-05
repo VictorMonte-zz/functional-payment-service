@@ -1,5 +1,5 @@
 [{:db/ident :payment-attempt/id
-  :db/valueType :db.type/string
+  :db/valueType :db.type/uuid
   :db/cardinality :db.cardinality/one
   :db/unique :db.unique/identity
   :db/doc "Payment attempt id"
@@ -12,7 +12,13 @@
   :db.install/_attribute :db.part/db}
 
  {:db/ident :payment-attempt/product-id
-  :db/valueType :db.type/string
+  :db/valueType :db.type/uuid
   :db/cardinality :db.cardinality/one
   :db/doc "Produc id related to this payment attempt"
+  :db.install/_attribute :db.part/db}
+
+ {:db/ident :payment-attempt/customer-id
+  :db/valueType :db.type/uuid
+  :db/cardinality :db.cardinality/one
+  :db/doc "Attempt payment customer's id"
   :db.install/_attribute :db.part/db}]
