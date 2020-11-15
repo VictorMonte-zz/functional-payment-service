@@ -10,7 +10,12 @@
             [schema.core :as s]))
 
 (s/def customer-id :- s/Uuid (uuid/uuid))
-(s/def payment-attempt (gen/generate models.payment-attempt/PaymentAttempt))
+
+(s/defn new-payment-attempt
+  [customer-id :- s/Uuid]
+  (-> (gen/generate models.payment-attempt/PaymentAttempt)
+                           (assoc :payment-attempt/customer-id customer-id)
+                           (assoc :payment-attempt/amount (bigdec (rand-int 100000M)))))
 
 (s/defn generate-payment-attempt
   [customer-id :- s/Uuid]
@@ -29,15 +34,21 @@
 
 (s/def payment-attempts (generate-payment-attemps 5 customer-id))
 
+
+(s/defn add-payments-into-db
+  [payment-attempts :- [models.payment-attempt/PaymentAttempt]
+   conn]
+  (doseq [payment-attempt payment-attempts]
+    (db.payments/idempotent-insert! payment-attempt conn)))
+
 (deftest insert-payment-attempt
-  (let [conn (utils.db/create-empty-in-memory-db)]
+  (let [conn (utils.db/create-empty-in-memory-db)
+        payment-attempt (new-payment-attempt customer-id)]
     (is (= payment-attempt
            (db.payments/idempotent-insert! payment-attempt conn)))))
 
-;;TODO: with one is passing with more it's get bad yet kkkk almost there..
 (deftest list-payment-attempts
-  (let [conn (utils.db/create-empty-in-memory-db)]
-    (doseq [payment-attempt payment-attempts]
-      (db.payments/idempotent-insert! payment-attempt conn))
-    (is (= (pprint (first payment-attempts))
-           (pprint (first (db.payments/get-all-by-customer-id customer-id conn)))))))
+  (let [conn             (utils.db/create-empty-in-memory-db)]
+    (add-payments-into-db payment-attempts conn)
+    (is (= (set payment-attempts)
+           (set (db.payments/get-all-by-customer-id customer-id conn))))))
